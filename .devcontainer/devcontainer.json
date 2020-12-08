@@ -31,7 +31,8 @@
 	],
 		
 	"containerEnv": {
-	    "SHELL": "/bin/sh"
+	        "SHELL": "/bin/zsh",
+	    	"PATH": "this should break"
 	},
 	
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
