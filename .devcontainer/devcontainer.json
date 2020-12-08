@@ -1,8 +1,5 @@
 // For format details, see https://aka.ms/vscode-remote/devcontainer.json or this file's README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.134.0/containers/javascript-node
 {
-	"image": "ghcr.io/julia-vscode/julia-devcontainer",
-	"extensions": ["julialang.language-julia"],
-	"postCreateCommand": "/julia-devcontainer-scripts/postcreate.jl",
-	"remoteUser": "vscode"
+	"image": "ubuntu"
 }
