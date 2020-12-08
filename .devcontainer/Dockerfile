@@ -3,7 +3,7 @@ ARG VARIANT="14"
 FROM ubuntu
 
 # Remove git for testing
-RUN apt-get remove git
+RUN apt-get -y update && apt-get remove git
 
 # [Optional] Uncomment this section to install additional OS packages.
 # RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
