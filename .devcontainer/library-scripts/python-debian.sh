@@ -9,7 +9,7 @@
 # Syntax: ./python-debian.sh [Python Version] [Python intall path] [PIPX_HOME] [non-root user] [Update rc files flag] [install tools]
 
 PYTHON_VERSION=${1:-"3.8.3"}
-PYTHON_INSTALL_PATH=${2:-"/usr/local/python${PYTHON_VERSION}"}
+PYTHON_INSTALL_PATH=${2:-"~/.pyenv/versions/${PYTHON_VERSION}"}
 export PIPX_HOME=${3:-"/usr/local/py-utils"}
 USERNAME=${4:-"automatic"}
 UPDATE_RC=${5:-"true"}
@@ -53,6 +53,13 @@ function updaterc() {
 
 export DEBIAN_FRONTEND=noninteractive
 
+# Install pyenv
+git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+cd ~/.pyenv && src/configure && make -C src
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bashrc
+
 # Install python from pyenv if needed
 if [ "${PYTHON_VERSION}" != "none" ]; then
 
@@ -72,12 +79,7 @@ if [ "${PYTHON_VERSION}" != "none" ]; then
             apt-get -y install --no-install-recommends ${PREREQ_PKGS}
         fi
 
-        # Download and install pyenv
-        git clone https://github.com/pyenv/pyenv.git ~/.pyenv
-        cd ~/.pyenv && src/configure && make -C src
-        echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
-        echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
-        echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bashrc
+        # Install python from pyenv
         exec "$SHELL"
         pyenv install ${PYTHON_VERSION}
         pyenv global ${PYTHON_VERSION}
