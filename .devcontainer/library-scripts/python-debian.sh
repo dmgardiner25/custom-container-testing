@@ -14,7 +14,6 @@ export PIPX_HOME=${3:-"/usr/local/py-utils"}
 USERNAME=${4:-"automatic"}
 UPDATE_RC=${5:-"true"}
 INSTALL_PYTHON_TOOLS=${6:-"true"}
-PYENV_PATH=/home/${USERNAME}/.pyenv
 
 set -e
 
@@ -55,9 +54,9 @@ function updaterc() {
 export DEBIAN_FRONTEND=noninteractive
 
 # Install pyenv
-git clone https://github.com/pyenv/pyenv.git ${PYENV_PATH}
-cd ${PYENV_PATH} && src/configure && make -C src
-export PYENV_ROOT=${PYENV_PATH}
+PYENV_ROOT=/home/${USERNAME}/.pyenv
+git clone https://github.com/pyenv/pyenv.git ${PYENV_ROOT}
+cd ${PYENV_ROOT} && src/configure && make -C src
 export PATH=${PYENV_ROOT}/bin:${PATH}
 
 # Install python from pyenv if needed
@@ -134,9 +133,9 @@ rm -rf /tmp/pip-tmp
 updaterc "$(cat << EOF
 export PIPX_HOME="${PIPX_HOME}"
 export PIPX_BIN_DIR="${PIPX_BIN_DIR}"
-export PYENV_ROOT="${PYENV_PATH}"
+export PYENV_ROOT="${PYENV_ROOT}"
 if [[ "\${PATH}" != *"\${PIPX_BIN_DIR}"* ]]; then export PATH="\${PATH}:\${PIPX_BIN_DIR}"; fi
-if [[ "\${PATH}" != *"\${PYENV_ROOT}"* ]]; then export PATH="\${PATH}:\${PYENV_ROOT}"; fi
+if [[ "\${PATH}" != *"\${PYENV_ROOT}/bin"* ]]; then export PATH="\${PATH}:\${PYENV_ROOT}/bin"; fi
 if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi
 EOF
 )"
