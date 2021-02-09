@@ -1,18 +1,7 @@
 {
-<<<<<<< Updated upstream
-	"name": "Node.js",
-		
-	"build": {
-		"dockerfile": "Dockerfile"
-	},
-
-	// Set *default* container specific settings.json values on container create.
-	"settings": {
-		"python.pythonPath": "/usr/local/bin/python",
-=======
 	"name": "GitHub Codespaces (Default)",
 	"build": {
-		"dockerfile": "base.Dockerfile"
+		"dockerfile": "Dockerfile"
 	},
 	"settings": {
 		"terminal.integrated.shell.linux": "/bin/bash",
@@ -22,7 +11,6 @@
 		"go.goroot": "/usr/local/go",
 		"go.toolsGopath": "/go/bin",
 		"python.pythonPath": "/opt/python/latest/bin/python",
->>>>>>> Stashed changes
 		"python.linting.enabled": true,
 		"python.linting.pylintEnabled": true,
 		"python.formatting.autopep8Path": "/usr/local/py-utils/bin/autopep8",
@@ -34,49 +22,25 @@
 		"python.linting.pycodestylePath": "/usr/local/py-utils/bin/pycodestyle",
 		"python.linting.pydocstylePath": "/usr/local/py-utils/bin/pydocstyle",
 		"python.linting.pylintPath": "/usr/local/py-utils/bin/pylint",
-<<<<<<< Updated upstream
-		"editor.fontFamily": "Consolas, 'Courier New', monospace"
-=======
 		"lldb.executable": "/usr/bin/lldb",
 		"files.watcherExclude": {
 			"**/target/**": true
 		}
->>>>>>> Stashed changes
 	},
 	"remoteUser": "codespace",
 	"overrideCommand": false,
 	"workspaceMount": "source=${localWorkspaceFolder},target=/home/codespace/workspace,type=bind,consistency=cached",
 	"workspaceFolder": "/home/codespace/workspace",
-	"mounts": [ "source=/var/run/docker.sock,target=/var/run/docker-host.sock,type=bind" ],
-	"runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
+	"runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined", "--privileged", "--init" ],
 
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
-<<<<<<< Updated upstream
-		"dbaeumer.vscode-eslint",
-		"ms-python.python"
-	],
-		
-	"containerEnv": {
-	        "SHELL": "/bin/zsh",
-	    	"PATH": "/bin/sh:/usr/bin/sh"
-	},
-	
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": [3000],
-=======
 		"GitHub.vscode-pull-request-github"
 	],
->>>>>>> Stashed changes
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 
-<<<<<<< Updated upstream
-	// Comment out the next line to run as root instead.
-	// "remoteUser": "node"
-=======
 	// "oryx build" will automatically install your dependencies and attempt to build your project
 	"postCreateCommand": "oryx build -p virtualenv_name=.venv || echo 'Could not auto-build. Skipping.'"
->>>>>>> Stashed changes
 }

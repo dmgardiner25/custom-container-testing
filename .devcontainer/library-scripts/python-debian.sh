@@ -53,7 +53,7 @@ function updaterc() {
 
 export DEBIAN_FRONTEND=noninteractive
 
-# Install python from source if needed
+# Install python from pyenv if needed
 if [ "${PYTHON_VERSION}" != "none" ]; then
 
     if [ -d "${PYTHON_INSTALL_PATH}" ]; then
@@ -63,7 +63,8 @@ if [ "${PYTHON_VERSION}" != "none" ]; then
         # Install prereqs if missing
         PREREQ_PKGS="curl ca-certificates tar make build-essential libffi-dev \
             libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
-            libncurses5-dev libncursesw5-dev xz-utils tk-dev"
+            libncurses5-dev libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev \
+            liblzma-dev python3-dev"
         if ! dpkg -s ${PREREQ_PKGS} > /dev/null 2>&1; then
             if [ ! -d "/var/lib/apt/lists" ] || [ "$(ls /var/lib/apt/lists/ | wc -l)" = "0" ]; then
                 apt-get update
@@ -71,23 +72,15 @@ if [ "${PYTHON_VERSION}" != "none" ]; then
             apt-get -y install --no-install-recommends ${PREREQ_PKGS}
         fi
 
-        # Download and build from src
-        mkdir -p /tmp/python-src "${PYTHON_INSTALL_PATH}"
-        cd /tmp/python-src
-        curl -sSL -o /tmp/python-dl.tgz "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz"
-        tar -xzf /tmp/python-dl.tgz -C "/tmp/python-src" --strip-components=1
-        ./configure --prefix="${PYTHON_INSTALL_PATH}" --enable-optimizations --with-ensurepip=install
-        make -j 8
-        make install
-        rm -rf /tmp/python-dl.tgz /tmp/python-src
-        cd /tmp
-        chown -R ${USERNAME} "${PYTHON_INSTALL_PATH}"
-        ln -s ${PYTHON_INSTALL_PATH}/bin/python3 ${PYTHON_INSTALL_PATH}/bin/python
-        ln -s ${PYTHON_INSTALL_PATH}/bin/pip3 ${PYTHON_INSTALL_PATH}/bin/pip
-        ln -s ${PYTHON_INSTALL_PATH}/bin/idle3 ${PYTHON_INSTALL_PATH}/bin/idle
-        ln -s ${PYTHON_INSTALL_PATH}/bin/pydoc3 ${PYTHON_INSTALL_PATH}/bin/pydoc
-        ln -s ${PYTHON_INSTALL_PATH}/bin/python3-config ${PYTHON_INSTALL_PATH}/bin/python-config
-        updaterc "export PATH=${PYTHON_INSTALL_PATH}/bin:\${PATH}"
+        # Download and install pyenv
+        git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+        cd ~/.pyenv && src/configure && make -C src
+        echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+        echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+        echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bashrc
+        exec "$SHELL"
+        pyenv install ${PYTHON_VERSION}
+        pyenv global ${PYTHON_VERSION}
     fi
 fi
 
@@ -109,7 +102,6 @@ DEFAULT_UTILS="\
     bandit \
     pipenv \
     virtualenv"
-
 
 export PIPX_BIN_DIR=${PIPX_HOME}/bin
 export PATH=${PYTHON_INSTALL_PATH}/bin:${PIPX_BIN_DIR}:${PATH}
