@@ -50,8 +50,6 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && bash /tmp/scripts/kubectl-helm-debian.sh \
     # Install Moby CLI and Engine
     && bash /tmp/scripts/docker-in-docker-debian.sh "true" "${USERNAME}" "true" \
-    # Build latest git from source
-    && bash /tmp/scripts/git-from-src-debian.sh "latest" \
     # Clean up
     && apt-get autoremove -y && apt-get clean -y
 

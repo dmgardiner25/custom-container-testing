@@ -136,6 +136,7 @@ export PIPX_HOME="${PIPX_HOME}"
 export PIPX_BIN_DIR="${PIPX_BIN_DIR}"
 export PYENV_ROOT="${PYENV_PATH}"
 if [[ "\${PATH}" != *"\${PIPX_BIN_DIR}"* ]]; then export PATH="\${PATH}:\${PIPX_BIN_DIR}"; fi
+if [[ "\${PATH}" != *"\${PYENV_ROOT}"* ]]; then export PATH="\${PATH}:\${PYENV_ROOT}"; fi
 if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi
 EOF
 )"
