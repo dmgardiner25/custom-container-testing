@@ -56,9 +56,10 @@ export DEBIAN_FRONTEND=noninteractive
 # Install pyenv
 git clone https://github.com/pyenv/pyenv.git ~/.pyenv
 cd ~/.pyenv && src/configure && make -C src
-echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
-echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
-echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bashrc
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> /etc/bash.bashrc
+echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> /etc/bash.bashrc
+echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> /etc/bash.bashrc
+exec "$SHELL"
 
 # Install python from pyenv if needed
 if [ "${PYTHON_VERSION}" != "none" ]; then
@@ -66,12 +67,11 @@ if [ "${PYTHON_VERSION}" != "none" ]; then
     if [ -d "${PYTHON_INSTALL_PATH}" ]; then
         echo "Path ${PYTHON_INSTALL_PATH} already exists. Assuming Python already installed."
     else
-        echo "Building Python ${PYTHON_VERSION} from source..."
+        echo "Installing Python ${PYTHON_VERSION} from pyenv..."
         # Install prereqs if missing
         PREREQ_PKGS="curl ca-certificates tar make build-essential libffi-dev \
             libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
-            libncurses5-dev libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev \
-            liblzma-dev python3-dev"
+            libncurses5-dev libncursesw5-dev xz-utils tk-dev"
         if ! dpkg -s ${PREREQ_PKGS} > /dev/null 2>&1; then
             if [ ! -d "/var/lib/apt/lists" ] || [ "$(ls /var/lib/apt/lists/ | wc -l)" = "0" ]; then
                 apt-get update
@@ -80,7 +80,6 @@ if [ "${PYTHON_VERSION}" != "none" ]; then
         fi
 
         # Install python from pyenv
-        exec "$SHELL"
         pyenv install ${PYTHON_VERSION}
         pyenv global ${PYTHON_VERSION}
     fi
