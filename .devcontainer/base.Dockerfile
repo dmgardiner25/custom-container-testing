@@ -45,7 +45,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
                                                   libx11-xcb1 libcups2 libxcomposite1 libxdamage1 libxfixes3 libpango-1.0-0 libgbm1 libgtk-3-0 \
     && bash /tmp/scripts/sshd-debian.sh \
     && bash /tmp/scripts/git-lfs-debian.sh \
-    && bash /tmp/scripts/github-debian.sh \
+    && apt-get install -yq git \
     && bash /tmp/scripts/azcli-debian.sh \
     && bash /tmp/scripts/kubectl-helm-debian.sh \
     # Install Moby CLI and Engine
