@@ -14,6 +14,7 @@ export PIPX_HOME=${3:-"/usr/local/py-utils"}
 USERNAME=${4:-"automatic"}
 UPDATE_RC=${5:-"true"}
 INSTALL_PYTHON_TOOLS=${6:-"true"}
+PYENV_PATH=/home/${USERNAME}/.pyenv
 
 set -e
 
@@ -54,12 +55,10 @@ function updaterc() {
 export DEBIAN_FRONTEND=noninteractive
 
 # Install pyenv
-git clone https://github.com/pyenv/pyenv.git ~/.pyenv
-cd ~/.pyenv && src/configure && make -C src
-echo 'export PYENV_ROOT="$HOME/.pyenv"' >> /etc/bash.bashrc
-echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> /etc/bash.bashrc
-echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> /etc/bash.bashrc
-exec "$SHELL"
+git clone https://github.com/pyenv/pyenv.git ${PYENV_PATH}
+cd ${PYENV_PATH} && src/configure && make -C src
+export PYENV_ROOT=${PYENV_PATH}
+export PATH=${PYENV_ROOT}/bin:${PATH}
 
 # Install python from pyenv if needed
 if [ "${PYTHON_VERSION}" != "none" ]; then
@@ -80,6 +79,7 @@ if [ "${PYTHON_VERSION}" != "none" ]; then
         fi
 
         # Install python from pyenv
+        exec ${SHELL}
         pyenv install ${PYTHON_VERSION}
         pyenv global ${PYTHON_VERSION}
     fi
@@ -103,6 +103,7 @@ DEFAULT_UTILS="\
     bandit \
     pipenv \
     virtualenv"
+
 
 export PIPX_BIN_DIR=${PIPX_HOME}/bin
 export PATH=${PYTHON_INSTALL_PATH}/bin:${PIPX_BIN_DIR}:${PATH}
@@ -133,6 +134,8 @@ rm -rf /tmp/pip-tmp
 updaterc "$(cat << EOF
 export PIPX_HOME="${PIPX_HOME}"
 export PIPX_BIN_DIR="${PIPX_BIN_DIR}"
+export PYENV_ROOT="${PYENV_PATH}"
 if [[ "\${PATH}" != *"\${PIPX_BIN_DIR}"* ]]; then export PATH="\${PATH}:\${PIPX_BIN_DIR}"; fi
+if [[ command -v pyenv 1>/dev/null 2>&1 ]]; then eval "$(pyenv init -)"; fi
 EOF
 )"
