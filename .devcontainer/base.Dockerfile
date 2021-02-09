@@ -71,39 +71,6 @@ RUN bash /tmp/scripts/python-debian.sh "none" "/opt/python/latest" "${PIPX_HOME}
     && ln -s $(which composer.phar) /usr/local/bin/composer \
     && apt-get clean -y
 
-# Install PowerShell and setup .NET Core
-COPY symlinkDotNetCore.sh /home/${USERNAME}/symlinkDotNetCore.sh
-RUN su ${USERNAME} -c 'bash /home/${USERNAME}/symlinkDotNetCore.sh' 2>&1 \
-    && bash /tmp/scripts/powershell-debian.sh \
-    && apt-get clean -y && rm -rf /home/${USERNAME}/symlinkDotNetCore.sh
-
-# Setup Node.js, install NVM and NVS
-RUN bash /tmp/scripts/node-debian.sh "${NVM_DIR}" "none" "${USERNAME}" \
-    && (cd ${NVM_DIR} && git remote get-url origin && echo $(git log -n 1 --pretty=format:%H -- .)) > ${NVM_DIR}/.git-remote-and-commit \
-    # Install nvs (alternate cross-platform Node.js version-management tool)
-    && sudo -u ${USERNAME} git clone -c advice.detachedHead=false --depth 1 https://github.com/jasongin/nvs ${NVS_HOME} 2>&1 \
-    && (cd ${NVS_HOME} && git remote get-url origin && echo $(git log -n 1 --pretty=format:%H -- .)) > ${NVS_HOME}/.git-remote-and-commit \
-    && sudo -u ${USERNAME} bash ${NVS_HOME}/nvs.sh install \
-    && rm ${NVS_HOME}/cache/* \
-    # Set npm global location
-    && sudo -u ${USERNAME} npm config set prefix ${NPM_GLOBAL} \
-    && npm config -g set prefix ${NPM_GLOBAL} \
-    # Clean up
-    && rm -rf ${NVM_DIR}/.git ${NVS_HOME}/.git
-
-# Install SDKMAN, OpenJDK8 (JDK 11 already present), gradle (maven already present)
-RUN bash /tmp/scripts/gradle-debian.sh "latest" "${SDKMAN_DIR}" "${USERNAME}" "true" \
-    && bash /tmp/scripts/java-debian.sh "8.0.275.hs-adpt" "${SDKMAN_DIR}" "${USERNAME}" "true" \
-    && su ${USERNAME} -c ". ${SDKMAN_DIR}/bin/sdkman-init.sh \
-        && sdk install java opt-java-11 /opt/java/11.0 \
-        && sdk install java opt-java-lts /opt/java/lts \
-        && sdk default java opt-java-lts"
-
-# Install Rust, Go, remove scripts now that we're done with them
-RUN bash /tmp/scripts/rust-debian.sh "${CARGO_HOME}" "${RUSTUP_HOME}" "${USERNAME}" "true" \
-    && bash /tmp/scripts/go-debian.sh "latest" "${GOROOT}" "${GOPATH}" "${USERNAME}" \
-    && apt-get clean -y && rm -rf /tmp/scripts
-
 # Mount for docker-in-docker 
 VOLUME [ "/var/lib/docker" ]
 
