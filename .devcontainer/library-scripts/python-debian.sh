@@ -54,11 +54,13 @@ function updaterc() {
 export DEBIAN_FRONTEND=noninteractive
 
 # Install pyenv
-PYENV_ROOT=/home/${USERNAME}/.pyenv
+export PYENV_ROOT=/home/${USERNAME}/.pyenv
+export PATH=${PYENV_ROOT}/bin:${PATH}
 git clone https://github.com/pyenv/pyenv.git ${PYENV_ROOT}
 cd ${PYENV_ROOT} && src/configure && make -C src
-export PATH=${PYENV_ROOT}/bin:${PATH}
-chown -R codespace $PYENV_ROOT
+if [ "${USERNAME}" != "root" ]; then
+    chown -R ${USERNAME} $PYENV_ROOT
+fi
 
 # Install python from pyenv if needed
 if [ "${PYTHON_VERSION}" != "none" ]; then
