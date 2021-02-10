@@ -58,6 +58,10 @@ PYENV_ROOT=/home/${USERNAME}/.pyenv
 git clone https://github.com/pyenv/pyenv.git ${PYENV_ROOT}
 cd ${PYENV_ROOT} && src/configure && make -C src
 export PATH=${PYENV_ROOT}/bin:${PATH}
+# Create pyenv group, dir, and set sticky bit
+if ! cat /etc/group | grep -e "^pyenv:" > /dev/null 2>&1; then
+    groupadd -r pyenv
+fi
 usermod -a -G pyenv ${USERNAME}
 umask 0002
 chown -R :pyenv ${PYENV_ROOT}
