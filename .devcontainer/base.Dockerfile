@@ -56,7 +56,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 
 # Install Python, PHP, Ruby utilities
 RUN apt-get install -yq python3-dev \
-    && bash /tmp/scripts/python-debian.sh "none" "/opt/python/latest" "${PIPX_HOME}" "${USERNAME}" "true" \
+    && bash /tmp/scripts/python-debian.sh "3.8.3" "" "${PIPX_HOME}" "${USERNAME}" "true" \
     # Install rvm, rbenv, base gems
     && chown -R ${USERNAME} /opt/ruby/*/lib /opt/ruby/*/bin \
     && bash /tmp/scripts/ruby-debian.sh "none" "${USERNAME}" "true" "true" \
