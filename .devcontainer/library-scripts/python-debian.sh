@@ -58,6 +58,10 @@ PYENV_ROOT=/home/${USERNAME}/.pyenv
 git clone https://github.com/pyenv/pyenv.git ${PYENV_ROOT}
 cd ${PYENV_ROOT} && src/configure && make -C src
 export PATH=${PYENV_ROOT}/bin:${PATH}
+usermod -a -G pyenv ${USERNAME}
+umask 0002
+chown -R :pyenv ${PYENV_ROOT}
+chmod -R g+s ${PYENV_ROOT}
 
 # Install python from pyenv if needed
 if [ "${PYTHON_VERSION}" != "none" ]; then
