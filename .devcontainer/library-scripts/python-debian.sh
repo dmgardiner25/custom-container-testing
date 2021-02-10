@@ -64,6 +64,7 @@ git clone --depth=1 \
 ln -s /usr/local/share/pyenv/bin/pyenv /usr/local/bin
 updaterc 'eval "$(pyenv init -)"'
 if [ "${USERNAME}" != "root" ]; then
+    mkdir /home/${USERNAME}/.pyenv
     chown -R ${USERNAME} /home/${USERNAME}/.pyenv
 fi
 
