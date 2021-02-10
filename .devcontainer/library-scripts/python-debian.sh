@@ -70,7 +70,6 @@ fi
 
 # Install python from pyenv if needed
 if [ "${PYTHON_VERSION}" != "none" ]; then
-
     if [ -d "${PYTHON_INSTALL_PATH}" ]; then
         echo "Path ${PYTHON_INSTALL_PATH} already exists. Assuming Python already installed."
     else
@@ -86,13 +85,9 @@ if [ "${PYTHON_VERSION}" != "none" ]; then
             apt-get -y install --no-install-recommends ${PREREQ_PKGS}
         fi
 
-        rm -rf /opt/python/latest/bin/python
-        rm -rf /usr/bin/python3
-
         # Install python from pyenv
         sudo -u $USERNAME pyenv install ${PYTHON_VERSION}
         sudo -u $USERNAME pyenv global ${PYTHON_VERSION}
-        pyenv versions
         updaterc "export PATH=/home/${USERNAME}/.pyenv/shims:${PATH}:\${PATH}"
     fi
 fi
@@ -115,7 +110,6 @@ DEFAULT_UTILS="\
     bandit \
     pipenv \
     virtualenv"
-
 
 export PIPX_BIN_DIR=${PIPX_HOME}/bin
 export PATH=${PYTHON_INSTALL_PATH}/bin:${PIPX_BIN_DIR}:${PATH}
