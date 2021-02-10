@@ -86,10 +86,14 @@ if [ "${PYTHON_VERSION}" != "none" ]; then
             apt-get -y install --no-install-recommends ${PREREQ_PKGS}
         fi
 
+        rm -rf /opt/python/latest/bin/python
+
         # Install python from pyenv
-        exec ${SHELL}
-        pyenv install ${PYTHON_VERSION}
-        pyenv global ${PYTHON_VERSION}
+        export PATH=/home/codespace/.pyenv/shims:${PATH}
+        echo $PATH
+        sudo -u $USERNAME pyenv install ${PYTHON_VERSION}
+        sudo -u $USERNAME pyenv global ${PYTHON_VERSION}
+        pyenv versions
     fi
 fi
 
