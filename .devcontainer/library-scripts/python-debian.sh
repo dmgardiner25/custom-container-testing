@@ -9,9 +9,9 @@
 # Syntax: ./python-debian.sh [Python Version] [Python intall path] [PIPX_HOME] [non-root user] [Update rc files flag] [install tools]
 
 PYTHON_VERSION=${1:-"3.8.3"}
-PYTHON_INSTALL_PATH=${2:-"~/.pyenv/versions/${PYTHON_VERSION}"}
 export PIPX_HOME=${3:-"/usr/local/py-utils"}
 USERNAME=${4:-"automatic"}
+PYTHON_INSTALL_PATH=${2:-"/home/${USERNAME}/.pyenv/versions/${PYTHON_VERSION}"}
 UPDATE_RC=${5:-"true"}
 INSTALL_PYTHON_TOOLS=${6:-"true"}
 
@@ -54,12 +54,22 @@ function updaterc() {
 export DEBIAN_FRONTEND=noninteractive
 
 # Install pyenv
-export PYENV_ROOT=/home/${USERNAME}/.pyenv
-export PATH=${PYENV_ROOT}/bin:${PATH}
-git clone https://github.com/pyenv/pyenv.git ${PYENV_ROOT}
-cd ${PYENV_ROOT} && src/configure && make -C src
+git clone https://github.com/pyenv/pyenv.git /usr/local/share/pyenv
 if [ "${USERNAME}" != "root" ]; then
     chown -R ${USERNAME} $PYENV_ROOT
+fi
+
+git clone --depth=1 \
+    -c core.eol=lf \
+    -c core.autocrlf=false \
+    -c fsck.zeroPaddedFilemode=ignore \
+    -c fetch.fsck.zeroPaddedFilemode=ignore \
+    -c receive.fsck.zeroPaddedFilemode=ignore \
+    https://github.com/pyenv/pyenv.git /usr/local/share/pyenv
+ln -s /usr/local/share/pyenv/bin/pyenv /usr/local/bin
+updaterc 'eval "$(pyenv init -)"'
+if [ "${USERNAME}" != "root" ]; then
+    chown -R ${USERNAME} /home/${USERNAME}/.pyenv
 fi
 
 # Install python from pyenv if needed
@@ -136,9 +146,6 @@ rm -rf /tmp/pip-tmp
 updaterc "$(cat << EOF
 export PIPX_HOME="${PIPX_HOME}"
 export PIPX_BIN_DIR="${PIPX_BIN_DIR}"
-export PYENV_ROOT="${PYENV_ROOT}"
 if [[ "\${PATH}" != *"\${PIPX_BIN_DIR}"* ]]; then export PATH="\${PATH}:\${PIPX_BIN_DIR}"; fi
-if [[ "\${PATH}" != *"\${PYENV_ROOT}/bin"* ]]; then export PATH="\${PATH}:\${PYENV_ROOT}/bin"; fi
-eval "\$(pyenv init -)"
 EOF
 )"
