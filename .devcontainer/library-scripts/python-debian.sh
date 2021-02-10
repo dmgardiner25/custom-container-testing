@@ -87,13 +87,13 @@ if [ "${PYTHON_VERSION}" != "none" ]; then
         fi
 
         rm -rf /opt/python/latest/bin/python
+        rm -rf /usr/bin/python3
 
         # Install python from pyenv
-        export PATH=/home/codespace/.pyenv/shims:${PATH}
-        echo $PATH
         sudo -u $USERNAME pyenv install ${PYTHON_VERSION}
         sudo -u $USERNAME pyenv global ${PYTHON_VERSION}
         pyenv versions
+        updaterc "export PATH=/home/${USERNAME}/.pyenv/shims:${PATH}:\${PATH}"
     fi
 fi
 
