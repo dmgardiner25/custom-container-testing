@@ -54,11 +54,6 @@ function updaterc() {
 export DEBIAN_FRONTEND=noninteractive
 
 # Install pyenv
-git clone https://github.com/pyenv/pyenv.git /usr/local/share/pyenv
-if [ "${USERNAME}" != "root" ]; then
-    chown -R ${USERNAME} $PYENV_ROOT
-fi
-
 git clone --depth=1 \
     -c core.eol=lf \
     -c core.autocrlf=false \
