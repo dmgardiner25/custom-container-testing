@@ -9,9 +9,9 @@
 # Syntax: ./python-debian.sh [Python Version] [Python intall path] [PIPX_HOME] [non-root user] [Update rc files flag] [install tools]
 
 PYTHON_VERSION=${1:-"3.8.3"}
+PYTHON_INSTALL_PATH=${2:-"/usr/local/python${PYTHON_VERSION}"}
 export PIPX_HOME=${3:-"/usr/local/py-utils"}
 USERNAME=${4:-"automatic"}
-PYTHON_INSTALL_PATH=${2:-"/home/${USERNAME}/.pyenv/versions/${PYTHON_VERSION}"}
 UPDATE_RC=${5:-"true"}
 INSTALL_PYTHON_TOOLS=${6:-"true"}
 
@@ -53,27 +53,13 @@ function updaterc() {
 
 export DEBIAN_FRONTEND=noninteractive
 
-# Install pyenv
-git clone --depth=1 \
-    -c core.eol=lf \
-    -c core.autocrlf=false \
-    -c fsck.zeroPaddedFilemode=ignore \
-    -c fetch.fsck.zeroPaddedFilemode=ignore \
-    -c receive.fsck.zeroPaddedFilemode=ignore \
-    https://github.com/pyenv/pyenv.git /usr/local/share/pyenv
-ln -s /usr/local/share/pyenv/bin/pyenv /usr/local/bin
-updaterc 'eval "$(pyenv init -)"'
-if [ "${USERNAME}" != "root" ]; then
-    mkdir /home/${USERNAME}/.pyenv
-    chown -R ${USERNAME} /home/${USERNAME}/.pyenv
-fi
-
-# Install python from pyenv if needed
+# Install python from source if needed
 if [ "${PYTHON_VERSION}" != "none" ]; then
+
     if [ -d "${PYTHON_INSTALL_PATH}" ]; then
         echo "Path ${PYTHON_INSTALL_PATH} already exists. Assuming Python already installed."
     else
-        echo "Installing Python ${PYTHON_VERSION} from pyenv..."
+        echo "Building Python ${PYTHON_VERSION} from source..."
         # Install prereqs if missing
         PREREQ_PKGS="curl ca-certificates tar make build-essential libffi-dev \
             libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
@@ -85,12 +71,23 @@ if [ "${PYTHON_VERSION}" != "none" ]; then
             apt-get -y install --no-install-recommends ${PREREQ_PKGS}
         fi
 
-        rm -rf /opt/python/latest/bin/python
-        rm -rf /usr/bin/python3
-
-        # Install python from pyenv
-        su ${USERNAME} -c "pyenv install ${PYTHON_VERSION} && pyenv global ${PYTHON_VERSION}"
-        updaterc "export PATH=/home/${USERNAME}/.pyenv/shims:${PATH}:\${PATH}"
+        # Download and build from src
+        mkdir -p /tmp/python-src "${PYTHON_INSTALL_PATH}"
+        cd /tmp/python-src
+        curl -sSL -o /tmp/python-dl.tgz "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz"
+        tar -xzf /tmp/python-dl.tgz -C "/tmp/python-src" --strip-components=1
+        ./configure --prefix="${PYTHON_INSTALL_PATH}" --enable-optimizations --with-ensurepip=install
+        make -j 8
+        make install
+        rm -rf /tmp/python-dl.tgz /tmp/python-src
+        cd /tmp
+        chown -R ${USERNAME} "${PYTHON_INSTALL_PATH}"
+        ln -s ${PYTHON_INSTALL_PATH}/bin/python3 ${PYTHON_INSTALL_PATH}/bin/python
+        ln -s ${PYTHON_INSTALL_PATH}/bin/pip3 ${PYTHON_INSTALL_PATH}/bin/pip
+        ln -s ${PYTHON_INSTALL_PATH}/bin/idle3 ${PYTHON_INSTALL_PATH}/bin/idle
+        ln -s ${PYTHON_INSTALL_PATH}/bin/pydoc3 ${PYTHON_INSTALL_PATH}/bin/pydoc
+        ln -s ${PYTHON_INSTALL_PATH}/bin/python3-config ${PYTHON_INSTALL_PATH}/bin/python-config
+        updaterc "export PATH=${PYTHON_INSTALL_PATH}/bin:\${PATH}"
     fi
 fi
 
@@ -112,6 +109,7 @@ DEFAULT_UTILS="\
     bandit \
     pipenv \
     virtualenv"
+
 
 export PIPX_BIN_DIR=${PIPX_HOME}/bin
 export PATH=${PYTHON_INSTALL_PATH}/bin:${PIPX_BIN_DIR}:${PATH}
