@@ -56,7 +56,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get autoremove -y && apt-get clean -y
 
 # Install Python, PHP, Ruby utilities
-RUN apt-get install -yq python3-dev \
+RUN apt-get -y install build-essential cmake cppcheck valgrind clang lldb llvm gdb \
     && bash /tmp/scripts/python-debian.sh "none" "/opt/python/latest" "${PIPX_HOME}" "${USERNAME}" "true" \
     # Install rvm, rbenv, base gems
     && chown -R ${USERNAME} /opt/ruby/*/lib /opt/ruby/*/bin \
